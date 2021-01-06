@@ -11,13 +11,15 @@ namespace garageQueue
 
             List<string> Garage = new List<string>(); //List ng slots sa garage
             List<string> History = new List<string>(); //List ng garage history
+            List<string> phantom = new List<string>();
             //Ito yung // two dimentinal int array {arrival, departure} na nakabase sa positioning ng CarList.
             int[,] CarRecord = new int[10, 2] { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, };
 
             bool keepGoing = true;
             while (keepGoing)
             {
-                Console.WriteLine("------ MattKyleRichard Car Collection ------");
+                Console.WriteLine("QueueGarage\n\n");
+                Console.WriteLine("------ MattKyleRichard Car Garage ------");
                 Console.Write("List of Registered Cars: ");
                 Console.WriteLine(String.Join(", ", CarList));
                 Console.WriteLine($"Garage Available Space: {10 - Garage.Count}");
@@ -69,7 +71,6 @@ namespace garageQueue
                         }
                         else //kung hindi naman ikaw ung una
                         {
-                            Garage.RemoveAll(x => ((string)x) == model);
                             Console.WriteLine(model + " has departed from the garage...");
                             int keyIndex = Array.FindIndex(CarList, w => w.Contains(model));
                             CarRecord[keyIndex, 1]++; // departure
@@ -80,13 +81,22 @@ namespace garageQueue
                                 int departIndex = Array.FindIndex(CarList, w => w.Contains(Garage[j]));
                                 CarRecord[departIndex, 1]++; // departure
                             }
-                            History.Add($"{model} has left.");
-                            for (int k = carIndex - 1; k >= 0; k--) //for loop na unang babalik ung huling lumabas .. k is index
+                            for (int l = carIndex - 1; l >= 0; l--) //for loop  matanggal ang mga nasa unahan
                             {
-                                History.Add($"{Garage[k]} has arrived.");
-                                int arriveIndex = Array.FindIndex(CarList, w => w.Contains(Garage[k]));
+                                phantom.Add(Garage[l]);
+                                Garage.Remove(Garage[l]);
+                            }
+                            History.Add($"{model} has left.");
+                            Garage.RemoveAll(x => ((string)x) == model);
+                            for (int m = phantom.Count - 1; m >= 0; m--)
+                            {
+                                Garage.Add(phantom[m]);
+                                History.Add($"{phantom[m]} has arrived.");
+                                int arriveIndex = Array.FindIndex(CarList, w => w.Contains(phantom[m]));
                                 CarRecord[arriveIndex, 0]++; // arrival
                             }
+                            phantom.Clear();
+
                         }
                     }
                     else
